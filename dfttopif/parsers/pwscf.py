@@ -1,4 +1,4 @@
-from pypif.obj.common.property import Property
+from pypif.obj.common import Property, Scalar
 
 from .base import DFTParser, Value_if_true
 import os
@@ -74,7 +74,7 @@ class PwscfParser(DFTParser):
     def get_cutoff_energy(self):
         '''Determine the cutoff energy from the output'''
         cutoff = self._get_line('kinetic-energy cutoff', self.outputf).split()[3:]
-        return Value(scalars=float(cutoff[0]), units=cutoff[1])
+        return Value(scalars=[Scalar(value=float(cutoff[0]))], units=cutoff[1])
 
     def get_total_energy(self):
         '''Determine the total energy from the output'''
@@ -83,7 +83,7 @@ class PwscfParser(DFTParser):
             for line in reversed(fp.readlines()):
                 if "!" in line and "total energy" in line:
                     energy = line.split()[4:]
-                    return Property(scalars=float(energy[0]), units=energy[1])
+                    return Property(scalars=[Scalar(value=float(energy[0]))], units=energy[1])
             raise Exception('%s not found in %s'%('! & total energy',os.path.join(self._directory, self.outputf)))
 
     @Value_if_true

@@ -1,4 +1,4 @@
-from pypif.obj.common.property import Property
+from pypif.obj.common import Property, Scalar
 
 from .base import DFTParser, Value_if_true
 import os
@@ -53,7 +53,7 @@ class VaspParser(DFTParser):
             for line in fp:
                 if "ENCUT" in line:
                     words = line.split()
-                    return Value(scalars=float(words[2]), units=words[3])
+                    return Value(scalars=[Scalar(value=float(words[2]))], units=words[3])
                 
         # Error handling: ENCUT not found
         raise Exception('ENCUT not found')
@@ -149,7 +149,7 @@ class VaspParser(DFTParser):
         return self._call_ase(Vasp().read_convergence)
 
     def get_total_energy(self):
-        return Property(scalars=self._call_ase(Vasp().read_energy)[0], units='eV')
+        return Property(scalars=[Scalar(value=self._call_ase(Vasp().read_energy)[0])], units='eV')
 
     def get_version_number(self):
         # Open up the OUTCAR

@@ -1,12 +1,12 @@
 import os
 from collections import Counter
-from pypif.obj.common import Value, Property
+from pypif.obj.common import Value, Property, Scalar
 
 
 def Value_if_true(func):
     '''Returns:
         Value if x is True, else None'''
-    return lambda x: Value() if func(x) == True else None
+    return lambda x: Value(scalars=[Scalar(value=True)]) if func(x) == True else Value(scalars=[Scalar(value=False)])
 
 
 class DFTParser(object):
@@ -212,7 +212,7 @@ class DFTParser(object):
         # Check for cached result
         if self._converged is None:
             self._converged = self._is_converged()
-        return Property(scalars=self._converged)
+        return Property(scalars=[Scalar(value=self._converged)])
 
     def get_pp_name(self):
         '''Read output to get the pseudopotentials names used for each elements
