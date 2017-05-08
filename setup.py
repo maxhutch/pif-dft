@@ -7,7 +7,7 @@ setup(
     url='https://github.com/CitrineInformatics/pif-dft',
     install_requires=[
         'ase',
-        'pypif==1.1.6',
+        'pypif>=1.2.0,<1.3.0',
     ],
     extras_require={
         'report': ["requests"],
