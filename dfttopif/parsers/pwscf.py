@@ -69,7 +69,7 @@ class PwscfParser(DFTParser):
             if xcstring[word][0] == '(':
                 xcstring = xcstring[:word]
                 break
-        return Value(scalars=" ".join(xcstring))
+        return Value(scalars=[Scalar(value=" ".join(xcstring))])
 
     def get_cutoff_energy(self):
         '''Determine the cutoff energy from the output'''
@@ -86,20 +86,21 @@ class PwscfParser(DFTParser):
                     return Property(scalars=[Scalar(value=float(energy[0]))], units=energy[1])
             raise Exception('%s not found in %s'%('! & total energy',os.path.join(self._directory, self.outputf)))
 
-    @Value_if_true
     def is_relaxed(self):
         '''Determine if relaxation run from the output'''
-        return self._get_line('Geometry Optimization', self.outputf, return_string=False)
+        result = self._get_line('Geometry Optimization', self.outputf, return_string=False)
+        return Property(scalars=[Scalar(value=result)])
 
     def _is_converged(self):
         '''Determine if calculation converged; for a relaxation (static) run
         we look for ionic (electronic) convergence in the output'''
-        if self.is_relaxed():
+        if self.is_relaxed().scalars[0].value:
             # relaxation run case
-            return self._get_line(['End of', 'Geometry Optimization'], self.outputf, return_string=False)
+            result = self._get_line(['End of', 'Geometry Optimization'], self.outputf, return_string=False)
         else:
             # static run case
-            return self._get_line('convergence has been achieved', self.outputf, return_string=False)
+            result = self._get_line('convergence has been achieved', self.outputf, return_string=False)
+        return result
 
     def get_KPPRA(self):
         '''Determine the no. of k-points in the BZ (from the input) times the
@@ -143,10 +144,10 @@ class PwscfParser(DFTParser):
         fp.close()
         raise Exception('%s not found in %s'%('KPOINTS',os.path.join(self._directory, self.inputf)))
 
-    @Value_if_true
     def uses_SOC(self):
         '''Looks for line with "with spin-orbit" in the output'''
-        return self._get_line('with spin-orbit', self.outputf, return_string=False)
+        result = self._get_line('with spin-orbit', self.outputf, return_string=False)
+        return Property(scalars=[Scalar(value=result)])
 
     def get_pp_name(self):
         '''Determine the pseudopotential names from the output'''
@@ -262,7 +263,7 @@ class PwscfParser(DFTParser):
                     break
             if len(coords) == 0: raise Exception('Cannot find the initial atomic coordinates')
 
-        if type(self.is_relaxed()) == type(None):
+        if not self.is_relaxed().scalars[0].value:
             # static run: create, populate, and return the initial structure
             structure = Atoms(symbols=atom_symbols, cell=unit_cell, pbc=True)
             structure.set_positions(coords)
@@ -339,7 +340,7 @@ class PwscfParser(DFTParser):
             ls = line.split()
             energy.append(float(ls[0])-efermi)
             dos.append(sum([float(i) for i in ls[1:1+ndoscol]]))
-        return Property(scalars=dos, units='number of states per unit cell', conditions=Value(name='energy', scalars=energy, units='eV'))
+        return Property(scalars=[Scalar(value=x) for x in dos], units='number of states per unit cell', conditions=Value(name='energy', scalars=[Scalar(value=x) for x in energy], units='eV'))
 
     def get_forces(self):
         return None

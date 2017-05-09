@@ -34,8 +34,8 @@ class TestPWSCFParser(unittest.TestCase):
         self.assertEquals(-143.96084355, energy.scalars[0].value)
         self.assertEquals('Ry', energy.units)
 
-        self.assertEquals(None, parser.uses_SOC())
-        self.assertEquals(None, parser.is_relaxed())
+        self.assertEquals(False, parser.uses_SOC().scalars[0].value)
+        self.assertEquals(False, parser.is_relaxed().scalars[0].value)
         self.assertEquals('SLA PW PBE PBE', parser.get_xc_functional().scalars[0].value)
         self.assertEquals(['f_pbe_v1.4.uspp.F.UPF','Na_pbe_v1.uspp.F.UPF'], list(map(lambda x: x.value, parser.get_pp_name().scalars)))
         self.assertEquals(3456, parser.get_KPPRA().scalars[0].value)
