@@ -6,7 +6,12 @@ import os
 import shutil
 
 class TestPWSCFParser(unittest.TestCase):
-        
+
+    def _test_similar(self, x, y, tol=1.0e9):
+        if x == 0.0 or y == 0.0:
+            self.assertLess(abs(x + y), tol)
+        self.assertLess(abs((x-y)/x), tol)
+
     def get_parser(self,name):
         '''Get a PwscfParser for a certain test'''
         unpack_example(os.path.join('examples', 'pwscf', name+'.tar.gz'))
@@ -28,7 +33,7 @@ class TestPWSCFParser(unittest.TestCase):
         self.assertEquals('PWSCF', parser.get_name())
 
         strc = parser.get_output_structure()
-        self.assertEquals(2.2713025676424632, strc.cell[0][2])
+        self._test_similar(2.2713025676424632, strc.cell[0][2])
         self.assertEquals(['F', 'Na'], strc.get_chemical_symbols())
         self.assertEquals('FNa', parser.get_composition())
         
@@ -66,7 +71,7 @@ class TestPWSCFParser(unittest.TestCase):
         self.assertEquals('PWSCF', parser.get_name())
 
         strc = parser.get_output_structure()
-        self.assertEquals(3.7373367889445048, strc.cell[0][0])
+        self._test_similar(7.0625424581405341, strc.cell[0][0])
         self.assertEquals(['Ti', 'Ti', 'Ti', 'Ti', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O'], strc.get_chemical_symbols())
         self.assertEquals('O8Ti4', parser.get_composition())
         
@@ -111,9 +116,9 @@ class TestPWSCFParser(unittest.TestCase):
         self.assertEquals('PWSCF', parser.get_name())
 
         strc = parser.get_output_structure()
-        self.assertEquals(1.5862881841690908, strc.cell[0][0])
-        self.assertEquals(2.7475322138658069, strc.cell[1][1])
-        self.assertEquals(39.999449897411992, strc.cell[2][2])
+        self._test_similar(1.5862881841690908, strc.cell[0][0])
+        self._test_similar(2.7475322138658069, strc.cell[1][1])
+        self._test_similar(39.999449897411992, strc.cell[2][2])
         self.assertEquals(['V', 'S', 'S'], strc.get_chemical_symbols())
         self.assertEquals('S2V', parser.get_composition())
         
@@ -155,9 +160,9 @@ class TestPWSCFParser(unittest.TestCase):
         self.assertEquals('PWSCF', parser.get_name())
 
         strc = parser.get_output_structure()
-        self.assertEquals(2.46596598034, strc.cell[0][0])
-        self.assertEquals(2.1355881881239482, strc.cell[1][1])
-        self.assertEquals(6.4115115488840004, strc.cell[2][2])
+        self._test_similar(2.46596598034, strc.cell[0][0])
+        self._test_similar(2.1355881881239482, strc.cell[1][1])
+        self._test_similar(6.4115115488840004, strc.cell[2][2])
         self.assertEquals(['C', 'C', 'C', 'C'], strc.get_chemical_symbols())
         self.assertEquals('C4', parser.get_composition())
         
@@ -201,8 +206,8 @@ class TestPWSCFParser(unittest.TestCase):
         # Test the settings
         self.assertEquals('PWSCF', parser.get_name())
         strc = parser.get_output_structure()
-        self.assertEquals(2.1669808346549999, strc.cell[0][0])
-        self.assertEquals(4.3339616693099998, strc.cell[1][1])
+        self._test_similar(2.1669808346549999, strc.cell[0][0])
+        self._test_similar(4.3339616693099998, strc.cell[1][1])
         self.assertEquals(['O', 'O', 'Fe', 'Fe'], strc.get_chemical_symbols())
         self.assertEquals('Fe2O2', parser.get_composition())
         

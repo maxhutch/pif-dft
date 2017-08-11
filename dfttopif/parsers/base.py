@@ -151,7 +151,16 @@ class DFTParser(object):
                 or None if output file not found
         '''
         raise NotImplementedError
-    
+
+    def get_input_structure(self):
+        '''Get the output structure, if available
+
+        Returns:
+            ase.Atoms - Output structure from this calculation
+                or None if output file not found
+        '''
+        raise NotImplementedError
+
     def get_composition(self):
         '''Get composition of output structure
         
@@ -159,12 +168,16 @@ class DFTParser(object):
             String - Composition based on output structure
         '''
         strc = self.get_output_structure()
+        if strc is None:
+            strc = self.get_input_structure()
         counts = Counter(strc.get_chemical_symbols())
         return ''.join(k if counts[k]==1 else '%s%d'%(k,counts[k]) \
                 for k in sorted(counts))
 
     def get_positions(self):
         strc = self.get_output_structure()
+        if strc is None:
+            strc = self.get_input_structure()
         return Property(vectors=strc.positions.tolist())
 
     def get_cutoff_energy(self):
